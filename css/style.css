@@ -1,0 +1,50 @@
+.container{
+    margin-top: 48px;
+    margin-bottom: 48px;
+}
+
+#selection-row {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+#chart-row {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.observed-line {
+    fill: none;
+    stroke: #636363;
+    stroke-width: 3;
+}
+
+.predicted-line {
+    fill: none;
+    stroke: #ff4f4f;
+    stroke-width: 3;
+}
+
+.predicted-area {
+    fill: #d12a2a;
+    opacity: 0.3;
+}
+
+.tooltip-el {
+    position: absolute;
+    visibility: hidden;
+    background-color: white;
+    border: solid;
+    left: 0px;
+    top: 0px;
+    width: 200px;
+    border-width: 1px;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.y-axis-label {
+    fill: #666666;
+    stroke: none;
+    font-size: 13px;
+}
