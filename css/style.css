@@ -15,18 +15,18 @@
 
 .observed-line {
     fill: none;
-    stroke: #636363;
+    stroke: #ff4f4f;
     stroke-width: 3;
 }
 
 .predicted-line {
     fill: none;
-    stroke: #ff4f4f;
+    stroke: #9c9c9c;
     stroke-width: 3;
 }
 
 .predicted-area {
-    fill: #d12a2a;
+    fill: #9c9c9c;
     opacity: 0.3;
 }
 
