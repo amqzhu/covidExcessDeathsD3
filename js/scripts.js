@@ -4,7 +4,7 @@ function covidExcessDeaths() {
     var observedData, predictedData, processedData = {};
     var selectViewAll = true, selectGenderMale = true, selectAge65Plus = true, selectCountry = "austria", selectYFree = true;
     var maxDate = new Date("2020-01-01"), minDate = new Date("2021-01-01");
-    var overallYMin = null, overallYMax = null;
+    var overallYMin = null, overallYMax = null, countryYMin = {}, countryYMax = {};
 
     var width = document.getElementById("chart-row").offsetWidth;
     var plotWidth, plotHeight;
@@ -188,7 +188,9 @@ function covidExcessDeaths() {
 
         const insideHeight = plotHeight - margin.top - margin.bottom;
         const y = d3.scaleLinear()
-            .domain(selectYFree ? [data.yMax, data.yMin] : [overallYMax, overallYMin])
+            .domain(selectYFree ? [data.yMax, data.yMin] : 
+                selectViewAll ? [overallYMax, overallYMin] : 
+                [countryYMax[data['country_label']], countryYMin[data['country_label']]])
             .range([0, insideHeight]);
 
         data.x = x;
@@ -226,8 +228,8 @@ function covidExcessDeaths() {
             .text(data[selectViewAll ? "country_label" : "sex_age"]);
 
         // vertical line
-        data.mappedYMin = y(selectYFree ? data.yMin : overallYMin);
-        data.mappedYMax = y(selectYFree ? data.yMax : overallYMax);
+        data.mappedYMin = y(selectYFree ? data.yMin : selectViewAll ? overallYMin : countryYMin[data['country_label']]);
+        data.mappedYMax = y(selectYFree ? data.yMax : selectViewAll ? overallYMax : countryYMax[data['country_label']]);
         svg.append("g").append("line")
             .attr("x1", x(data["minDatePredicted"]))
             .attr("x2", x(data["minDatePredicted"]))
@@ -347,8 +349,10 @@ function covidExcessDeaths() {
                 weekData["q975"] = Math.round(elem.q975);
             }
         });
+
         for (const countryData of Object.values(processedData)) {
             for (const chartData of Object.values(countryData)) {
+                const countryName = chartData['country_label'];
                 const weeksData = chartData["all_weeks"];
                 const deathVals = weeksData.map(elem => elem.deaths)
                     .concat(weeksData.map(elem => elem.q500))
@@ -358,19 +362,34 @@ function covidExcessDeaths() {
 
                 chartData.yMin = Math.min(...deathVals);
                 chartData.yMax = Math.max(...deathVals);
-                console.log(chartData.yMin, chartData.yMax)
+
                 if ((overallYMin == null) || (chartData.yMin < overallYMin)) {
                     overallYMin = chartData.yMin;
                 }
                 if ((overallYMax == null) || (chartData.yMax > overallYMax)) {
                     overallYMax = chartData.yMax;
                 }
+
+                
+                if (countryYMin.hasOwnProperty(countryName)) {
+                    countryYMin[countryName] = Math.min(countryYMin[countryName], chartData.yMin);
+                } else {
+                    countryYMin[countryName] = chartData.yMin;
+                }
+
+                if (countryYMax.hasOwnProperty(countryName)) {
+                    countryYMax[countryName] = Math.max(countryYMax[countryName], chartData.yMax);
+                } else {
+                    countryYMax[countryName] = chartData.yMax;
+                }
+
                 const minDatePredicted = weeksData.filter(elem => elem.hasOwnProperty('q500'))
                     .map(elem => elem.week).sort()[0];
                 chartData["minDatePredicted"] = chartData[minDatePredicted]["xWeek"];
                 chartData["weekStartOffset"] = 7 - chartData["minDatePredicted"].getUTCDay();
             }
         }
+
         drawPlot();
     }
 }
